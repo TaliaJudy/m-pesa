@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pay with M-PESA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #e0ffe0, #ccffcc);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      color: green;
+      margin-bottom: 1rem;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: darkgreen;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Pay with M-PESA</h2>
+
+    <input type="tel" id="phone" placeholder="Safaricom Phone Number (e.g. 0712345678)" />
+    <input type="number" id="amount" placeholder="Amount (KES)" />
+
+    <button onclick="makePayment()">Pay Now</button>
+
+    <p class="note">You will receive a payment prompt on your phone.</p>
+  </div>
+
+  <script>
+    async function makePayment() {
+      const phone = document.getElementById('phone').value;
+      const amount = document.getElementById('amount').value;
+
+      if (!phone || !amount) {
+        alert('Please enter both phone number and amount.');
+        return;
+      }
+
+      if (!phone.startsWith('07') || phone.length !== 10) {
+        alert('Enter a valid Safaricom number (e.g. 0712345678)');
+        return;
+      }
+
+      const formattedPhone = '254' + phone.slice(1);
+
+      try {
+        const response = await fetch('http://localhost:3000/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: formattedPhone, amount })
+        });
+
+        const result = await response.json();
+        alert(result.message || 'Payment request sent to your phone.');
+      } catch (error) {
+        console.error(error);
+        alert('Something went wrong. Please try again.');
+      }
+    }
+  </script>
+
+</body>
+</html>
